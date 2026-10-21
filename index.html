@@ -1,245 +1,406 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pushup Tracker Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --accent-color: #2563eb;
-            --success-color: #10b981;
-            --timer-bg: #2d3748;
-            --input-bg: #2a2a2a;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 16px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
         }
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        h1 { font-size: 1.8rem; margin-bottom: 4px; color: #fff; text-align: center; }
-        .subtitle { text-align: center; color: #888; margin-bottom: 24px; font-size: 0.9rem; }
-        h2 { font-size: 1.3rem; margin: 0 0 12px 0; color: #fff; display: flex; align-items: center; justify-content: space-between; }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        /* Card styles */
         .card {
-            background: var(--card-bg);
-            padding: 16px;
+            background-color: var(--card-bg);
             border-radius: 12px;
+            padding: 18px;
             margin-bottom: 20px;
-            border-left: 5px solid var(--accent-color);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-left: 5px solid var(--accent-blue);
+            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .week-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #2d2d2d;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-        .week-title { font-weight: bold; color: #fff; font-size: 1.1rem; }
-        .week-counter { background: #2d2d2d; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; color: var(--success-color); font-weight: bold; }
-        .target-sub { color: #aaa; font-size: 0.85rem; margin-top: 4px; display: block; }
-        .warmup-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 14px 0;
-        }
-        .warmup-left { display: flex; align-items: center; font-size: 1rem; }
-        input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
-            margin-right: 12px;
-            accent-color: var(--accent-color);
-            cursor: pointer;
-        }
-        .timer-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        #timer-display {
-            display: none;
-            background: var(--timer-bg);
-            text-align: center;
-            padding: 16px;
-            border-radius: 8px;
-            margin-top: 12px;
-            border: 1px dashed var(--accent-color);
-        }
-        #timer-num { font-size: 2.8rem; font-weight: bold; color: #fff; }
-        #timer-label { font-size: 0.95rem; color: #cbd5e1; font-weight: 500; }
-        .week-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-        }
+
+        /* Day Grid Items */
         .grid-day {
-            background: #2a2a2a;
-            padding: 14px 0;
+            background-color: #334155;
+            padding: 12px 6px;
             text-align: center;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: all 0.2s ease;
-            border: 1px solid transparent;
+            border: 2px solid transparent;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+        .grid-day:hover {
+            background-color: #475569;
+        }
         .grid-day.active-selection {
-            border: 2px solid var(--accent-color);
-            background: #222;
+            border-color: var(--accent-blue);
+            background-color: #1e293b;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
         }
         .grid-day.checked {
-            background: var(--success-color);
-            color: white;
+            background-color: #059669;
+            color: #ffffff;
         }
+        .grid-day.checked.active-selection {
+            border-color: #6ee7b7;
+        }
+
         .day-total-badge {
             display: block;
             font-size: 0.75rem;
-            color: #aaa;
+            color: #cbd5e1;
             font-weight: normal;
-            margin-top: 2px;
+            margin-top: 4px;
         }
-        .grid-day.checked .day-total-badge { color: #fff; font-weight: bold; }
-        
-        #logger-panel {
-            display: none;
-            background: #1a1a1a;
-            border: 2px solid #333;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+        .grid-day.checked .day-total-badge {
+            color: #ecfdf5;
+            font-weight: bold;
         }
-        .logger-title { font-size: 1.1rem; font-weight: bold; color: #fff; margin-bottom: 12px; display: flex; justify-content: space-between; }
-        .set-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 10px 0;
-        }
-        .set-label { font-size: 0.95rem; color: #ccc; }
+
+        /* Input styling */
         .rep-input {
-            width: 70px;
-            background: var(--input-bg);
-            border: 1px solid #444;
-            border-radius: 6px;
-            color: #fff;
-            padding: 8px;
+            width: 85px;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #ffffff;
+            padding: 10px;
             text-align: center;
-            font-size: 1rem;
-            font-weight: bold;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .save-btn {
-            background: var(--success-color);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 8px;
+        .rep-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
         }
-        .reset-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 24px 0 40px 0;
+
+        /* Modals and Overlays */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        /* Keyframe Pulse Effect for active timer */
+        @keyframes timerPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .timer-running {
+            animation: timerPulse 1.5s infinite;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>💪 Pushup Tracker Pro</h1>
-        <div class="subtitle">Granular Session Volume Logger</div>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-xl mx-auto">
         
-        <!-- Warmup Panel -->
-        <div class="card" style="border-left-color: #f59e0b;">
-            <h2>⏱️ 2-Min Preparation</h2>
-            <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox"> <span>Shoulder Circles</span></div>
-                <button class="timer-btn" onclick="startWarmupTimer('Shoulder Circles')">🚀 Start 30s</button>
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-1 flex items-center justify-center gap-2">
+                <span>💪</span> Pushup Tracker Pro
+            </h1>
+            <p class="text-slate-400 text-sm sm:text-base font-medium">Granular Progressive Workout & Volume Logger</p>
+        </header>
+
+        <!-- Dynamic Overall Stats Dashboard -->
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
+                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Reps</span>
+                <span id="stat-total-reps" class="text-xl sm:text-2xl font-black text-blue-400">0</span>
             </div>
-            <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox"> <span>Chest Openers</span></div>
-                <button class="timer-btn" onclick="startWarmupTimer('Chest Openers')">🚀 Start 30s</button>
+            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
+                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Completed</span>
+                <span id="stat-completed-days" class="text-xl sm:text-2xl font-black text-emerald-400">0 / 28</span>
             </div>
-            <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox"> <span>Scapular Shrugs</span></div>
-                <button class="timer-btn" onclick="startWarmupTimer('Scapular Shrugs')">🚀 Start 30s</button>
+            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
+                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Avg / Set</span>
+                <span id="stat-avg-set" class="text-xl sm:text-2xl font-black text-purple-400">0</span>
             </div>
-            <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox"> <span>Wrist Rolls</span></div>
-                <button class="timer-btn" onclick="startWarmupTimer('Wrist Rolls')">🚀 Start 30s</button>
+            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
+                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Streak</span>
+                <span id="stat-streak" class="text-xl sm:text-2xl font-black text-amber-400">0 Days</span>
+            </div>
+        </section>
+
+        <!-- 2-Minute Preparation & Warm-up Card -->
+        <section class="card" style="border-left-color: var(--accent-amber);">
+            <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>⏱️</span> 2-Min Preparation & Warm-up
+                </h2>
+                <span class="text-xs bg-amber-500/20 text-amber-300 font-semibold px-2.5 py-1 rounded-full border border-amber-500/30">
+                    30s Each
+                </span>
             </div>
 
-            <div id="timer-display">
-                <div id="timer-label">Active Movement</div>
-                <div id="timer-num">30</div>
-            </div>
-        </div>
-
-        <!-- Volume Logging Panel -->
-        <div id="logger-panel">
-            <div class="logger-title"><span id="log-day-title">Log Day 1</span> <span style="color: var(--accent-color);" id="log-day-total">Total: 0 reps</span></div>
-            <div class="set-row">
-                <span class="set-label">Set 1 Reps:</span>
-                <input type="number" id="input-s1" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
-            </div>
-            <div class="set-row">
-                <span class="set-label">Set 2 Reps:</span>
-                <input type="number" id="input-s2" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
-            </div>
-            <div class="set-row">
-                <span class="set-label">Set 3 Reps:</span>
-                <input type="number" id="input-s3" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
-            </div>
-            <button class="save-btn" onclick="saveActiveDayLog()">💾 Save Workout Session</button>
-        </div>
-
-        <!-- Week 1 Tracking Layout -->
-        <div class="card">
-            <div class="week-header">
-                <div>
-                    <span class="week-title">Week 1: Consistency</span>
-                    <span class="target-sub">Target: 40 Daily Reps (3 sets of 13, 13, 14)</span>
+            <!-- Warmup Items List -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
+                    <label for="chk-warmup-1" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
+                        <input type="checkbox" id="chk-warmup-1" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
+                        <span>Shoulder Circles</span>
+                    </label>
+                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
+                        onclick="startWarmupTimer('Shoulder Circles', 'chk-warmup-1')">
+                        🚀 Start 30s
+                    </button>
                 </div>
-                <span class="week-counter" id="count-w1">0/7 Done</span>
-            </div>
-            <div class="week-grid">
-                <div class="grid-day" id="day-1" onclick="openLoggerPanel(1)">Day 1<span class="day-total-badge" id="badge-1">-</span></div>
-                <div class="grid-day" id="day-2" onclick="openLoggerPanel(2)">Day 2<span class="day-total-badge" id="badge-2">-</span></div>
-                <div class="grid-day" id="day-3" onclick="openLoggerPanel(3)">Day 3<span class="day-total-badge" id="badge-3">-</span></div>
-                <div class="grid-day" id="day-4" onclick="openLoggerPanel(4)">Day 4<span class="day-total-badge" id="badge-4">-</span></div>
-                <div class="grid-day" id="day-5" onclick="openLoggerPanel(5)">Day 5<span class="day-total-badge" id="badge-5">-</span></div>
-                <div class="grid-day" id="day-6" onclick="openLoggerPanel(6)">Day 6<span class="day-total-badge" id="badge-6">-</span></div>
-                <div class="grid-day" id="day-7" onclick="openLoggerPanel(7)">Day 7<span class="day-total-badge" id="badge-7">-</span></div>
-            </div>
-        </div>
 
-        <!-- Week 2 Tracking Layout -->
-        <div class="card" style="border-left-color: #3b82f6;">
-            <div class="week-header">
-                <div>
+                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
+                    <label for="chk-warmup-2" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
+                        <input type="checkbox" id="chk-warmup-2" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
+                        <span>Chest Openers</span>
+                    </label>
+                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
+                        onclick="startWarmupTimer('Chest Openers', 'chk-warmup-2')">
+                        🚀 Start 30s
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
+                    <label for="chk-warmup-3" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
+                        <input type="checkbox" id="chk-warmup-3" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
+                        <span>Scapular Shrugs</span>
+                    </label>
+                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
+                        onclick="startWarmupTimer('Scapular Shrugs', 'chk-warmup-3')">
+                        🚀 Start 30s
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
+                    <label for="chk-warmup-4" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
+                        <input type="checkbox" id="chk-warmup-4" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
+                        <span>Wrist Rolls</span>
+                    </label>
+                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
+                        onclick="startWarmupTimer('Wrist Rolls', 'chk-warmup-4')">
+                        🚀 Start 30s
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Countdown Timer Banner -->
+            <div id="timer-display" class="hidden mt-4 p-4 bg-slate-900/90 rounded-xl border border-amber-500/50 text-center shadow-lg">
+                <div id="timer-label" class="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-1">Active Movement</div>
+                <div id="timer-num" class="text-4xl font-extrabold text-white my-1">30</div>
+                <div class="w-full bg-slate-800 rounded-full h-2 my-2 overflow-hidden">
+                    <div id="timer-progress" class="bg-amber-500 h-2 rounded-full transition-all duration-1000" style="width: 100%;"></div>
+                </div>
+                <button onclick="stopTimer()" class="text-xs text-rose-400 hover:text-rose-300 font-medium underline mt-1">
+                    Cancel Timer
+                </button>
+            </div>
+        </section>
+
+        <!-- Dynamic Volume Logging Panel -->
+        <section id="logger-panel" class="hidden bg-slate-900 border-2 border-blue-500 rounded-2xl p-5 mb-6 shadow-2xl transition-all">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
+                <h3 id="log-day-title" class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>📝</span> Log Workout Day
+                </h3>
+                <span id="log-day-total" class="text-sm font-extrabold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/30">
+                    Total: 0 reps
+                </span>
+            </div>
+
+            <div class="space-y-3 mb-5">
+                <div class="flex justify-between items-center bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
+                    <span class="text-sm font-semibold text-slate-300">Set 1 Reps:</span>
+                    <input type="number" id="input-s1" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
+                </div>
+                <div class="flex justify-between items-center bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
+                    <span class="text-sm font-semibold text-slate-300">Set 2 Reps:</span>
+                    <input type="number" id="input-s2" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
+                </div>
+                <div class="flex justify-between items-center bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
+                    <span class="text-sm font-semibold text-slate-300">Set 3 Reps:</span>
+                    <input type="number" id="input-s3" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="saveActiveDayLog()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg font-bold text-sm shadow-md transition">
+                    💾 Save Workout Session
+                </button>
+                <button onclick="closeLoggerPanel()" class="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-lg font-semibold text-sm transition">
+                    Cancel
+                </button>
+            </div>
+        </section>
+
+        <!-- 4-Week Progressive Program Grid -->
+        <main class="space-y-5">
+            
+            <!-- Week 1: Consistency -->
+            <section class="card" style="border-left-color: var(--accent-blue);">
+                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
+                    <div>
+                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 1: Consistency</h3>
+                        <span class="text-xs text-slate-400">Target: ~40 Daily Reps (13, 13, 14)</span>
+                    </div>
+                    <span id="count-w1" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
+                        0/7 Done
+                    </span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                    <script>
+                        for(let d=1; d<=7; d++) {
+                            document.write(`
+                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
+                                    D${d}
+                                    <span class="day-total-badge" id="badge-${d}">-</span>
+                                </div>
+                            `);
+                        }
+                    </script>
+                </div>
+            </section>
+
+            <!-- Week 2: Progression -->
+            <section class="card" style="border-left-color: var(--accent-purple);">
+                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
+                    <div>
+                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 2: Progression</h3>
+                        <span class="text-xs text-slate-400">Target: ~50 Daily Reps (16, 17, 17)</span>
+                    </div>
+                    <span id="count-w2" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
+                        0/7 Done
+                    </span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                    <script>
+                        for(let d=8; d<=14; d++) {
+                            document.write(`
+                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
+                                    D${d}
+                                    <span class="day-total-badge" id="badge-${d}">-</span>
+                                </div>
+                            `);
+                        }
+                    </script>
+                </div>
+            </section>
+
+            <!-- Week 3: Endurance -->
+            <section class="card" style="border-left-color: var(--accent-pink);">
+                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
+                    <div>
+                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 3: Endurance</h3>
+                        <span class="text-xs text-slate-400">Target: ~65 Daily Reps (20, 22, 23)</span>
+                    </div>
+                    <span id="count-w3" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
+                        0/7 Done
+                    </span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                    <script>
+                        for(let d=15; d<=21; d++) {
+                            document.write(`
+                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
+                                    D${d}
+                                    <span class="day-total-badge" id="badge-${d}">-</span>
+                                </div>
+                            `);
+                        }
+                    </script>
+                </div>
+            </section>
+
+            <!-- Week 4: Mastery -->
+            <section class="card" style="border-left-color: var(--accent-emerald);">
+                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
+                    <div>
+                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 4: Mastery</h3>
+                        <span class="text-xs text-slate-400">Target: ~80+ Daily Reps (25, 27, 28)</span>
+                    </div>
+                    <span id="count-w4" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
+                        0/7 Done
+                    </span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                    <script>
+                        for(let d=22; d<=28; d++) {
+                            document.write(`
+                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
+                                    D${d}
+                                    <span class="day-total-badge" id="badge-${d}">-</span>
+                                </div>
+                            `);
+                        }
+                    </script>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Danger Zone / Reset Controls -->
+        <footer class="mt-8 mb-6 text-center">
+            <button onclick="showResetConfirmation()" 
+                class="bg-rose-900/30 hover:bg-rose-900/60 text-rose-300 border border-rose-700/50 text-xs px-4 py-2.5 rounded-xl font-bold transition">
+                🗑️ Reset All Progress & Workout History
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="reset-modal" class="modal-overlay">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div class="text-3xl mb-2">⚠️</div>
+            <h3 class="text-lg font-bold text-white mb-2">Reset Workout Data?</h3>
+            <p class="text-slate-300 text-xs mb-6 leading-relaxed">
+                Are you sure you want to delete all saved reps, workout logs, and warm-up statuses? This action cannot be undone.
+            </p>
+            <div class="flex gap-3">
+                <button onclick="closeResetConfirmation()" 
+                    class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs py-2.5 rounded-lg font-bold transition">
+                    Cancel
+                </button>
+                <button onclick="executeResetData()" 
+                    class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-xs py-2.5 rounded-lg font-bold transition">
+                    Yes, Clear Al
