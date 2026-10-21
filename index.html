@@ -1,406 +1,611 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pushup Tracker Pro</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-blue: #3b82f6;
-            --accent-purple: #8b5cf6;
-            --accent-pink: #ec4899;
-            --accent-emerald: #10b981;
-            --accent-amber: #f59e0b;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --timer-bg: #2d3748;
+            --input-bg: #2a2a2a;
+            --border-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 16px;
             min-height: 100vh;
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
         }
 
-        /* Card styles */
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 20px;
-            border-left: 5px solid var(--accent-blue);
-            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        /* Day Grid Items */
-        .grid-day {
-            background-color: #334155;
-            padding: 12px 6px;
+        header {
             text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Dashboard Overview */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 10px 4px;
             border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-val {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #aaa;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--accent-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d2d2d;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .week-title {
+            font-weight: bold;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .week-counter {
+            background: #2d2d2d;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .target-sub {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Warmup Section */
+        .warmup-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 12px 0;
+        }
+
+        .warmup-left {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .timer-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .timer-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        #timer-display {
+            display: none;
+            background: var(--timer-bg);
+            text-align: center;
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 1px dashed var(--accent-color);
+        }
+
+        #timer-num {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        #timer-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        /* Day Grid Layout */
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .grid-day {
+            background: #2a2a2a;
+            padding: 10px 0;
+            text-align: center;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             transition: all 0.2s ease;
-            border: 2px solid transparent;
-            user-select: none;
+            border: 1px solid transparent;
             -webkit-tap-highlight-color: transparent;
         }
+
         .grid-day:hover {
-            background-color: #475569;
+            background: #333;
         }
+
         .grid-day.active-selection {
-            border-color: var(--accent-blue);
-            background-color: #1e293b;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+            border: 2px solid var(--accent-color);
+            background: #222;
         }
+
         .grid-day.checked {
-            background-color: #059669;
-            color: #ffffff;
-        }
-        .grid-day.checked.active-selection {
-            border-color: #6ee7b7;
+            background: var(--success-color);
+            color: white;
         }
 
         .day-total-badge {
             display: block;
-            font-size: 0.75rem;
-            color: #cbd5e1;
+            font-size: 0.7rem;
+            color: #aaa;
             font-weight: normal;
-            margin-top: 4px;
+            margin-top: 2px;
         }
+
         .grid-day.checked .day-total-badge {
-            color: #ecfdf5;
+            color: #fff;
             font-weight: bold;
         }
 
-        /* Input styling */
-        .rep-input {
-            width: 85px;
-            background-color: #0f172a;
-            border: 1px solid #475569;
-            border-radius: 8px;
-            color: #ffffff;
-            padding: 10px;
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: 700;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        /* Logger Panel */
+        #logger-panel {
+            display: none;
+            background: #1a1a1a;
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.6);
         }
+
+        .logger-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .set-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .set-label {
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+
+        .rep-input {
+            width: 80px;
+            background: var(--input-bg);
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+            padding: 8px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
         .rep-input:focus {
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+            border-color: var(--accent-color);
         }
 
-        /* Modals and Overlays */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
+        .save-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: opacity 0.2s;
         }
 
-        /* Keyframe Pulse Effect for active timer */
-        @keyframes timerPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        .save-btn:hover {
+            opacity: 0.9;
         }
-        .timer-running {
-            animation: timerPulse 1.5s infinite;
+
+        .reset-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0 40px 0;
+            transition: opacity 0.2s;
+        }
+
+        .reset-btn:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
-<body class="p-4 sm:p-6 md:p-8">
-
-    <div class="max-w-xl mx-auto">
-        
-        <!-- Header -->
-        <header class="text-center mb-6">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-1 flex items-center justify-center gap-2">
-                <span>💪</span> Pushup Tracker Pro
-            </h1>
-            <p class="text-slate-400 text-sm sm:text-base font-medium">Granular Progressive Workout & Volume Logger</p>
+<body>
+    <div class="container">
+        <header>
+            <h1>💪 Pushup Tracker Pro</h1>
+            <div class="subtitle">Granular Session Volume Logger</div>
         </header>
 
-        <!-- Dynamic Overall Stats Dashboard -->
-        <section class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
-                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Reps</span>
-                <span id="stat-total-reps" class="text-xl sm:text-2xl font-black text-blue-400">0</span>
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="stat-total">0</div>
+                <div class="stat-label">Total Reps</div>
             </div>
-            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
-                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Completed</span>
-                <span id="stat-completed-days" class="text-xl sm:text-2xl font-black text-emerald-400">0 / 28</span>
+            <div class="stat-card">
+                <div class="stat-val" id="stat-done">0/28</div>
+                <div class="stat-label">Done</div>
             </div>
-            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
-                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Avg / Set</span>
-                <span id="stat-avg-set" class="text-xl sm:text-2xl font-black text-purple-400">0</span>
+            <div class="stat-card">
+                <div class="stat-val" id="stat-avg">0</div>
+                <div class="stat-label">Avg/Set</div>
             </div>
-            <div class="bg-slate-800/90 p-3 rounded-xl border border-slate-700/80 text-center shadow-sm">
-                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block">Streak</span>
-                <span id="stat-streak" class="text-xl sm:text-2xl font-black text-amber-400">0 Days</span>
+            <div class="stat-card">
+                <div class="stat-val" id="stat-streak">0 🔥</div>
+                <div class="stat-label">Streak</div>
             </div>
-        </section>
-
-        <!-- 2-Minute Preparation & Warm-up Card -->
-        <section class="card" style="border-left-color: var(--accent-amber);">
-            <div class="flex justify-between items-center mb-3 border-b border-slate-700 pb-2">
-                <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                    <span>⏱️</span> 2-Min Preparation & Warm-up
-                </h2>
-                <span class="text-xs bg-amber-500/20 text-amber-300 font-semibold px-2.5 py-1 rounded-full border border-amber-500/30">
-                    30s Each
-                </span>
+        </div>
+        
+        <!-- Warmup Panel -->
+        <div class="card" style="border-left-color: var(--warning-color);">
+            <div class="week-header">
+                <span class="week-title">⏱️ Warmup Preparation</span>
+                <span class="target-sub" style="margin: 0;">30s per movement</span>
             </div>
-
-            <!-- Warmup Items List -->
-            <div class="space-y-3">
-                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
-                    <label for="chk-warmup-1" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
-                        <input type="checkbox" id="chk-warmup-1" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
-                        <span>Shoulder Circles</span>
-                    </label>
-                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
-                        onclick="startWarmupTimer('Shoulder Circles', 'chk-warmup-1')">
-                        🚀 Start 30s
-                    </button>
-                </div>
-
-                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
-                    <label for="chk-warmup-2" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
-                        <input type="checkbox" id="chk-warmup-2" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
-                        <span>Chest Openers</span>
-                    </label>
-                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
-                        onclick="startWarmupTimer('Chest Openers', 'chk-warmup-2')">
-                        🚀 Start 30s
-                    </button>
-                </div>
-
-                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
-                    <label for="chk-warmup-3" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
-                        <input type="checkbox" id="chk-warmup-3" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
-                        <span>Scapular Shrugs</span>
-                    </label>
-                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
-                        onclick="startWarmupTimer('Scapular Shrugs', 'chk-warmup-3')">
-                        🚀 Start 30s
-                    </button>
-                </div>
-
-                <div class="flex items-center justify-between bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50">
-                    <label for="chk-warmup-4" class="flex items-center gap-3 cursor-pointer select-none text-sm font-medium">
-                        <input type="checkbox" id="chk-warmup-4" class="w-5 h-5 accent-amber-500 rounded cursor-pointer">
-                        <span>Wrist Rolls</span>
-                    </label>
-                    <button class="timer-btn bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition"
-                        onclick="startWarmupTimer('Wrist Rolls', 'chk-warmup-4')">
-                        🚀 Start 30s
-                    </button>
-                </div>
+            <div class="warmup-item">
+                <label class="warmup-left"><input type="checkbox" id="warmup-0"> <span>Shoulder Circles</span></label>
+                <button class="timer-btn" onclick="startWarmupTimer('Shoulder Circles', 0)">🚀 Start 30s</button>
+            </div>
+            <div class="warmup-item">
+                <label class="warmup-left"><input type="checkbox" id="warmup-1"> <span>Chest Openers</span></label>
+                <button class="timer-btn" onclick="startWarmupTimer('Chest Openers', 1)">🚀 Start 30s</button>
+            </div>
+            <div class="warmup-item">
+                <label class="warmup-left"><input type="checkbox" id="warmup-2"> <span>Scapular Shrugs</span></label>
+                <button class="timer-btn" onclick="startWarmupTimer('Scapular Shrugs', 2)">🚀 Start 30s</button>
+            </div>
+            <div class="warmup-item">
+                <label class="warmup-left"><input type="checkbox" id="warmup-3"> <span>Wrist Rolls</span></label>
+                <button class="timer-btn" onclick="startWarmupTimer('Wrist Rolls', 3)">🚀 Start 30s</button>
             </div>
 
-            <!-- Active Countdown Timer Banner -->
-            <div id="timer-display" class="hidden mt-4 p-4 bg-slate-900/90 rounded-xl border border-amber-500/50 text-center shadow-lg">
-                <div id="timer-label" class="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-1">Active Movement</div>
-                <div id="timer-num" class="text-4xl font-extrabold text-white my-1">30</div>
-                <div class="w-full bg-slate-800 rounded-full h-2 my-2 overflow-hidden">
-                    <div id="timer-progress" class="bg-amber-500 h-2 rounded-full transition-all duration-1000" style="width: 100%;"></div>
-                </div>
-                <button onclick="stopTimer()" class="text-xs text-rose-400 hover:text-rose-300 font-medium underline mt-1">
-                    Cancel Timer
-                </button>
+            <div id="timer-display">
+                <div id="timer-label">Active Movement</div>
+                <div id="timer-num">30</div>
             </div>
-        </section>
+        </div>
 
         <!-- Dynamic Volume Logging Panel -->
-        <section id="logger-panel" class="hidden bg-slate-900 border-2 border-blue-500 rounded-2xl p-5 mb-6 shadow-2xl transition-all">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-                <h3 id="log-day-title" class="text-lg font-bold text-white flex items-center gap-2">
-                    <span>📝</span> Log Workout Day
-                </h3>
-                <span id="log-day-total" class="text-sm font-extrabold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/30">
-                    Total: 0 reps
-                </span>
+        <div id="logger-panel">
+            <div class="logger-title">
+                <span id="log-day-title">Log Day 1</span>
+                <span style="color: var(--accent-color);" id="log-day-total">Total: 0 reps</span>
             </div>
-
-            <div class="space-y-3 mb-5">
-                <div class="flex justify-between items-center bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
-                    <span class="text-sm font-semibold text-slate-300">Set 1 Reps:</span>
-                    <input type="number" id="input-s1" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
-                </div>
-                <div class="flex justify-between items-center bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
-                    <span class="text-sm font-semibold text-slate-300">Set 2 Reps:</span>
-                    <input type="number" id="input-s2" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
-                </div>
-                <div class="flex justify-between items-center bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/60">
-                    <span class="text-sm font-semibold text-slate-300">Set 3 Reps:</span>
-                    <input type="number" id="input-s3" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
-                </div>
+            <div class="set-row">
+                <span class="set-label">Set 1 Reps:</span>
+                <input type="number" id="input-s1" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
             </div>
-
-            <div class="flex gap-3">
-                <button onclick="saveActiveDayLog()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg font-bold text-sm shadow-md transition">
-                    💾 Save Workout Session
-                </button>
-                <button onclick="closeLoggerPanel()" class="px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-lg font-semibold text-sm transition">
-                    Cancel
-                </button>
+            <div class="set-row">
+                <span class="set-label">Set 2 Reps:</span>
+                <input type="number" id="input-s2" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
             </div>
-        </section>
+            <div class="set-row">
+                <span class="set-label">Set 3 Reps:</span>
+                <input type="number" id="input-s3" class="rep-input" placeholder="0" min="0" oninput="calculateLiveTotal()">
+            </div>
+            <button class="save-btn" onclick="saveActiveDayLog()">💾 Save Workout Session</button>
+        </div>
 
-        <!-- 4-Week Progressive Program Grid -->
-        <main class="space-y-5">
-            
-            <!-- Week 1: Consistency -->
-            <section class="card" style="border-left-color: var(--accent-blue);">
-                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
-                    <div>
-                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 1: Consistency</h3>
-                        <span class="text-xs text-slate-400">Target: ~40 Daily Reps (13, 13, 14)</span>
-                    </div>
-                    <span id="count-w1" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                        0/7 Done
-                    </span>
-                </div>
-                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                    <script>
-                        for(let d=1; d<=7; d++) {
-                            document.write(`
-                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
-                                    D${d}
-                                    <span class="day-total-badge" id="badge-${d}">-</span>
-                                </div>
-                            `);
-                        }
-                    </script>
-                </div>
-            </section>
+        <!-- 4-Week Program Container -->
+        <div id="weeks-container"></div>
 
-            <!-- Week 2: Progression -->
-            <section class="card" style="border-left-color: var(--accent-purple);">
-                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
-                    <div>
-                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 2: Progression</h3>
-                        <span class="text-xs text-slate-400">Target: ~50 Daily Reps (16, 17, 17)</span>
-                    </div>
-                    <span id="count-w2" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                        0/7 Done
-                    </span>
-                </div>
-                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                    <script>
-                        for(let d=8; d<=14; d++) {
-                            document.write(`
-                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
-                                    D${d}
-                                    <span class="day-total-badge" id="badge-${d}">-</span>
-                                </div>
-                            `);
-                        }
-                    </script>
-                </div>
-            </section>
-
-            <!-- Week 3: Endurance -->
-            <section class="card" style="border-left-color: var(--accent-pink);">
-                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
-                    <div>
-                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 3: Endurance</h3>
-                        <span class="text-xs text-slate-400">Target: ~65 Daily Reps (20, 22, 23)</span>
-                    </div>
-                    <span id="count-w3" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                        0/7 Done
-                    </span>
-                </div>
-                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                    <script>
-                        for(let d=15; d<=21; d++) {
-                            document.write(`
-                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
-                                    D${d}
-                                    <span class="day-total-badge" id="badge-${d}">-</span>
-                                </div>
-                            `);
-                        }
-                    </script>
-                </div>
-            </section>
-
-            <!-- Week 4: Mastery -->
-            <section class="card" style="border-left-color: var(--accent-emerald);">
-                <div class="flex justify-between items-start mb-3 border-b border-slate-700/70 pb-2">
-                    <div>
-                        <h3 class="font-extrabold text-white text-base sm:text-lg">Week 4: Mastery</h3>
-                        <span class="text-xs text-slate-400">Target: ~80+ Daily Reps (25, 27, 28)</span>
-                    </div>
-                    <span id="count-w4" class="text-xs font-bold bg-slate-800 text-emerald-400 border border-slate-700 px-2.5 py-1 rounded-full">
-                        0/7 Done
-                    </span>
-                </div>
-                <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
-                    <script>
-                        for(let d=22; d<=28; d++) {
-                            document.write(`
-                                <div class="grid-day" id="day-${d}" onclick="openLoggerPanel(${d})">
-                                    D${d}
-                                    <span class="day-total-badge" id="badge-${d}">-</span>
-                                </div>
-                            `);
-                        }
-                    </script>
-                </div>
-            </section>
-
-        </main>
-
-        <!-- Danger Zone / Reset Controls -->
-        <footer class="mt-8 mb-6 text-center">
-            <button onclick="showResetConfirmation()" 
-                class="bg-rose-900/30 hover:bg-rose-900/60 text-rose-300 border border-rose-700/50 text-xs px-4 py-2.5 rounded-xl font-bold transition">
-                🗑️ Reset All Progress & Workout History
-            </button>
-        </footer>
-
+        <button class="reset-btn" onclick="resetAllData()">⚠️ Reset All Progress Data</button>
     </div>
 
-    <!-- Reset Confirmation Modal -->
-    <div id="reset-modal" class="modal-overlay">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
-            <div class="text-3xl mb-2">⚠️</div>
-            <h3 class="text-lg font-bold text-white mb-2">Reset Workout Data?</h3>
-            <p class="text-slate-300 text-xs mb-6 leading-relaxed">
-                Are you sure you want to delete all saved reps, workout logs, and warm-up statuses? This action cannot be undone.
-            </p>
-            <div class="flex gap-3">
-                <button onclick="closeResetConfirmation()" 
-                    class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs py-2.5 rounded-lg font-bold transition">
-                    Cancel
-                </button>
-                <button onclick="executeResetData()" 
-                    class="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-xs py-2.5 rounded-lg font-bold transition">
-                    Yes, Clear Al
+    <script>
+        // Program Plan Data Definition
+        const PROGRAM = [
+            { week: 1, title: "Week 1: Consistency", target: "Target: 40 Daily Reps (13, 13, 14)", color: "#2563eb", startDay: 1 },
+            { week: 2, title: "Week 2: Progression", target: "Target: 50 Daily Reps (16, 16, 18)", color: "#3b82f6", startDay: 8 },
+            { week: 3, title: "Week 3: Endurance", target: "Target: 60 Daily Reps (20, 20, 20)", color: "#8b5cf6", startDay: 15 },
+            { week: 4, title: "Week 4: Mastery", target: "Target: 75 Daily Reps (25, 25, 25)", color: "#ec4899", startDay: 22 }
+        ];
+
+        let activeDay = null;
+        let timerInterval = null;
+        let trackerData = JSON.parse(localStorage.getItem('pushup_tracker_pro')) || {};
+
+        // Web Audio API Audio Chime
+        function playChime() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3); // A5
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (e) {
+                console.log("Audio play prevented", e);
+            }
+        }
+
+        // Initialize UI Weeks & Days
+        function renderProgramUI() {
+            const container = document.getElementById('weeks-container');
+            container.innerHTML = '';
+
+            PROGRAM.forEach(w => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.borderLeftColor = w.color;
+
+                let gridHTML = '';
+                let completedInWeek = 0;
+
+                for (let d = w.startDay; d < w.startDay + 7; d++) {
+                    const dayData = trackerData[d];
+                    const isDone = dayData && (dayData.s1 > 0 || dayData.s2 > 0 || dayData.s3 > 0);
+                    const totalReps = isDone ? (dayData.s1 + dayData.s2 + dayData.s3) : 0;
+                    
+                    if (isDone) completedInWeek++;
+
+                    gridHTML += `
+                        <div class="grid-day ${isDone ? 'checked' : ''} ${activeDay === d ? 'active-selection' : ''}" 
+                             id="day-${d}" 
+                             onclick="openLoggerPanel(${d})">
+                            Day ${d}
+                            <span class="day-total-badge" id="badge-${d}">${isDone ? totalReps + ' reps' : '-'}</span>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="week-header">
+                        <div>
+                            <span class="week-title">${w.title}</span>
+                            <span class="target-sub">${w.target}</span>
+                        </div>
+                        <span class="week-counter" id="count-w${w.week}">${completedInWeek}/7 Done</span>
+                    </div>
+                    <div class="week-grid">
+                        ${gridHTML}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            updateOverallStats();
+        }
+
+        // Open Logger Panel for selected day
+        function openLoggerPanel(dayNumber) {
+            activeDay = dayNumber;
+            document.getElementById('logger-panel').style.display = 'block';
+            document.getElementById('log-day-title').innerText = `Log Session for Day ${dayNumber}`;
+
+            // Reset selection styling
+            document.querySelectorAll('.grid-day').forEach(el => el.classList.remove('active-selection'));
+            const activeElem = document.getElementById(`day-${dayNumber}`);
+            if (activeElem) activeElem.classList.add('active-selection');
+
+            // Populate existing saved values if present
+            const dayData = trackerData[dayNumber] || { s1: '', s2: '', s3: '' };
+            document.getElementById('input-s1').value = dayData.s1 || '';
+            document.getElementById('input-s2').value = dayData.s2 || '';
+            document.getElementById('input-s3').value = dayData.s3 || '';
+
+            calculateLiveTotal();
+            
+            // Scroll smoothly into view
+            document.getElementById('logger-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Calculate live sum in logging form
+        function calculateLiveTotal() {
+            const s1 = parseInt(document.getElementById('input-s1').value) || 0;
+            const s2 = parseInt(document.getElementById('input-s2').value) || 0;
+            const s3 = parseInt(document.getElementById('input-s3').value) || 0;
+            const total = s1 + s2 + s3;
+
+            document.getElementById('log-day-total').innerText = `Total: ${total} reps`;
+            return { s1, s2, s3, total };
+        }
+
+        // Save entry to state & local storage
+        function saveActiveDayLog() {
+            if (!activeDay) return;
+
+            const { s1, s2, s3, total } = calculateLiveTotal();
+
+            if (total === 0) {
+                delete trackerData[activeDay];
+            } else {
+                trackerData[activeDay] = { s1, s2, s3 };
+            }
+
+            localStorage.setItem('pushup_tracker_pro', JSON.stringify(trackerData));
+            renderProgramUI();
+        }
+
+        // Calculate Overview Statistics
+        function updateOverallStats() {
+            let totalReps = 0;
+            let completedDays = 0;
+            let totalSetsCount = 0;
+            let currentStreak = 0;
+            let tempStreak = 0;
+
+            for (let d = 1; d <= 28; d++) {
+                const day = trackerData[d];
+                if (day && (day.s1 > 0 || day.s2 > 0 || day.s3 > 0)) {
+                    completedDays++;
+                    const reps = (day.s1 || 0) + (day.s2 || 0) + (day.s3 || 0);
+                    totalReps += reps;
+
+                    if (day.s1 > 0) totalSetsCount++;
+                    if (day.s2 > 0) totalSetsCount++;
+                    if (day.s3 > 0) totalSetsCount++;
+
+                    tempStreak++;
+                    currentStreak = Math.max(currentStreak, tempStreak);
+                } else {
+                    tempStreak = 0;
+                }
+            }
+
+            const avgPerSet = totalSetsCount > 0 ? Math.round(totalReps / totalSetsCount) : 0;
+
+            document.getElementById('stat-total').innerText = totalReps;
+            document.getElementById('stat-done').innerText = `${completedDays}/28`;
+            document.getElementById('stat-avg').innerText = avgPerSet;
+            document.getElementById('stat-streak').innerText = `${currentStreak} 🔥`;
+        }
+
+        // Warmup 30s Countdown Timer
+        function startWarmupTimer(label, warmupIndex) {
+            clearInterval(timerInterval);
+
+            const display = document.getElementById('timer-display');
+            const timerLabel = document.getElementById('timer-label');
+            const timerNum = document.getElementById('timer-num');
+
+            display.style.display = 'block';
+            timerLabel.innerText = `Active Movement: ${label}`;
+
+            let secondsLeft = 30;
+            timerNum.innerText = secondsLeft;
+
+            timerInterval = setInterval(() => {
+                secondsLeft--;
+                timerNum.innerText = secondsLeft;
+
+                if (secondsLeft <= 0) {
+                    clearInterval(timerInterval);
+                    playChime();
+                    timerLabel.innerText = `Completed: ${label}!`;
+                    const checkbox = document.getElementById(`warmup-${warmupIndex}`);
+                    if (checkbox) checkbox.checked = true;
+                }
+            }, 1000);
+        }
+
+        // Reset All Application Data
+        function resetAllData() {
+            if (confirm("Are you sure you want to clear all your saved pushup logs?")) {
+                localStorage.removeItem('pushup_tracker_pro');
+                trackerData = {};
+                document.getElementById('logger-panel').style.display = 'none';
+                activeDay = null;
+                renderProgramUI();
+            }
+        }
+
+        // Initialize App on load
+        renderProgramUI();
+    </script>
+</body>
+</html>
