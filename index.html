@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pushup Tracker Pro</title>
     <style>
         :root {
@@ -15,38 +15,48 @@
             --input-bg: #2a2a2a;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
             padding: 16px;
-            padding-bottom: 60px;
         }
         .container {
             max-width: 480px;
             margin: 0 auto;
         }
-        h1 { font-size: 1.8rem; margin: 10px 0 4px 0; color: #fff; text-align: center; }
-        .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 0.9rem; font-weight: 500; }
-        h2 { font-size: 1.25rem; margin: 0 0 12px 0; color: #fff; display: flex; align-items: center; }
+        h1 { font-size: 1.8rem; margin-bottom: 4px; color: #fff; text-align: center; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 24px; font-size: 0.9rem; }
+        h2 { font-size: 1.3rem; margin: 0 0 12px 0; color: #fff; display: flex; align-items: center; justify-content: space-between; }
         .card {
             background: var(--card-bg);
             padding: 16px;
             border-radius: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             border-left: 5px solid var(--accent-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d2d2d;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+        .week-title { font-weight: bold; color: #fff; font-size: 1.1rem; }
+        .week-counter { background: #2d2d2d; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; color: var(--success-color); font-weight: bold; }
+        .target-sub { color: #aaa; font-size: 0.85rem; margin-top: 4px; display: block; }
         .warmup-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin: 12px 0;
+            margin: 14px 0;
         }
         .warmup-left { display: flex; align-items: center; font-size: 1rem; }
-        .chk-box {
-            width: 22px;
-            height: 22px;
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
             margin-right: 12px;
             accent-color: var(--accent-color);
             cursor: pointer;
@@ -60,75 +70,59 @@
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
         }
-        .timer-btn:active { background: #1d4ed8; }
         #timer-display {
             display: none;
             background: var(--timer-bg);
             text-align: center;
-            padding: 14px;
+            padding: 16px;
             border-radius: 8px;
             margin-top: 12px;
             border: 1px dashed var(--accent-color);
         }
-        #timer-num { font-size: 2.6rem; font-weight: bold; color: #fff; line-height: 1; margin-bottom: 4px; }
-        #timer-label { font-size: 0.9rem; color: #cbd5e1; }
-        
-        .week-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #2d2d2d;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-        .week-title { font-weight: bold; color: #fff; font-size: 1.05rem; }
-        .week-counter { background: #2d2d2d; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; color: var(--success-color); font-weight: bold; }
-        .target-sub { color: #aaa; font-size: 0.8rem; margin-top: 2px; display: block; }
-        
+        #timer-num { font-size: 2.8rem; font-weight: bold; color: #fff; }
+        #timer-label { font-size: 0.95rem; color: #cbd5e1; font-weight: 500; }
         .week-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
         .grid-day {
             background: #2a2a2a;
-            padding: 12px 0;
+            padding: 14px 0;
             text-align: center;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.15s ease;
-            -webkit-tap-highlight-color: transparent;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
             border: 1px solid transparent;
+            -webkit-tap-highlight-color: transparent;
         }
         .grid-day.active-selection {
             border: 2px solid var(--accent-color);
             background: #222;
         }
-        .grid-day.completed {
+        .grid-day.checked {
             background: var(--success-color);
             color: white;
         }
         .day-total-badge {
             display: block;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: #aaa;
             font-weight: normal;
             margin-top: 2px;
         }
-        .grid-day.completed .day-total-badge { color: #fff; font-weight: bold; }
-
-        /* Logger Panel Overlay Container */
+        .grid-day.checked .day-total-badge { color: #fff; font-weight: bold; }
+        
         #logger-panel {
             display: none;
             background: #1a1a1a;
             border: 2px solid #333;
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             box-shadow: 0 6px 16px rgba(0,0,0,0.6);
         }
         .logger-title { font-size: 1.1rem; font-weight: bold; color: #fff; margin-bottom: 12px; display: flex; justify-content: space-between; }
@@ -150,7 +144,6 @@
             font-size: 1rem;
             font-weight: bold;
         }
-        .rep-input:focus { border-color: var(--accent-color); outline: none; }
         .save-btn {
             background: var(--success-color);
             color: white;
@@ -163,18 +156,17 @@
             cursor: pointer;
             margin-top: 8px;
         }
-        .save-btn:active { background: #059669; }
         .reset-btn {
             background: #ef4444;
             color: white;
             border: none;
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 20px;
+            margin: 24px 0 40px 0;
         }
     </style>
 </head>
@@ -183,33 +175,33 @@
         <h1>💪 Pushup Tracker Pro</h1>
         <div class="subtitle">Granular Session Volume Logger</div>
         
-        <!-- Warmup Component -->
+        <!-- Warmup Panel -->
         <div class="card" style="border-left-color: #f59e0b;">
             <h2>⏱️ 2-Min Preparation</h2>
             <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox" class="chk-box"> <span>Shoulder Circles</span></div>
+                <div class="warmup-left"><input type="checkbox"> <span>Shoulder Circles</span></div>
                 <button class="timer-btn" onclick="startWarmupTimer('Shoulder Circles')">🚀 Start 30s</button>
             </div>
             <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox" class="chk-box"> <span>Chest Openers</span></div>
+                <div class="warmup-left"><input type="checkbox"> <span>Chest Openers</span></div>
                 <button class="timer-btn" onclick="startWarmupTimer('Chest Openers')">🚀 Start 30s</button>
             </div>
             <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox" class="chk-box"> <span>Scapular Shrugs</span></div>
+                <div class="warmup-left"><input type="checkbox"> <span>Scapular Shrugs</span></div>
                 <button class="timer-btn" onclick="startWarmupTimer('Scapular Shrugs')">🚀 Start 30s</button>
             </div>
             <div class="warmup-item">
-                <div class="warmup-left"><input type="checkbox" class="chk-box"> <span>Wrist Rolls</span></div>
+                <div class="warmup-left"><input type="checkbox"> <span>Wrist Rolls</span></div>
                 <button class="timer-btn" onclick="startWarmupTimer('Wrist Rolls')">🚀 Start 30s</button>
             </div>
 
             <div id="timer-display">
-                <div id="timer-num">30</div>
                 <div id="timer-label">Active Movement</div>
+                <div id="timer-num">30</div>
             </div>
         </div>
 
-        <!-- Dynamic Workout Session Logger Interface Panel -->
+        <!-- Volume Logging Panel -->
         <div id="logger-panel">
             <div class="logger-title"><span id="log-day-title">Log Day 1</span> <span style="color: var(--accent-color);" id="log-day-total">Total: 0 reps</span></div>
             <div class="set-row">
@@ -227,7 +219,7 @@
             <button class="save-btn" onclick="saveActiveDayLog()">💾 Save Workout Session</button>
         </div>
 
-        <!-- Week 1 Tracking Architecture Grid -->
+        <!-- Week 1 Tracking Layout -->
         <div class="card">
             <div class="week-header">
                 <div>
@@ -242,3 +234,12 @@
                 <div class="grid-day" id="day-3" onclick="openLoggerPanel(3)">Day 3<span class="day-total-badge" id="badge-3">-</span></div>
                 <div class="grid-day" id="day-4" onclick="openLoggerPanel(4)">Day 4<span class="day-total-badge" id="badge-4">-</span></div>
                 <div class="grid-day" id="day-5" onclick="openLoggerPanel(5)">Day 5<span class="day-total-badge" id="badge-5">-</span></div>
+                <div class="grid-day" id="day-6" onclick="openLoggerPanel(6)">Day 6<span class="day-total-badge" id="badge-6">-</span></div>
+                <div class="grid-day" id="day-7" onclick="openLoggerPanel(7)">Day 7<span class="day-total-badge" id="badge-7">-</span></div>
+            </div>
+        </div>
+
+        <!-- Week 2 Tracking Layout -->
+        <div class="card" style="border-left-color: #3b82f6;">
+            <div class="week-header">
+                <div>
